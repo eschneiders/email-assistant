@@ -1318,7 +1318,6 @@ def process_email(email):
             tg_msg_id = send_telegram(message, keyboard)
             if tg_msg_id:
                 pending_approvals[approval_id]["telegram_message_id"] = tg_msg_id
-                pending_approvals[f"tg:{tg_msg_id}"] = approval_id
                 pending_approvals[f"tgorig:{tg_msg_id}"] = approval_id
     else:
         # Open approval UI in browser (on Mac)
@@ -1329,7 +1328,6 @@ def process_email(email):
         tg_msg_id = send_telegram(message, keyboard)
         if tg_msg_id:
             pending_approvals[approval_id]["telegram_message_id"] = tg_msg_id
-            pending_approvals[f"tg:{tg_msg_id}"] = approval_id
             pending_approvals[f"tgorig:{tg_msg_id}"] = approval_id
             save_pending_approvals()
 
@@ -1562,13 +1560,11 @@ def process_general_email(email):
             tg_msg_id = send_general_telegram(message, keyboard)
             if tg_msg_id:
                 pending_approvals[approval_id]["telegram_message_id"] = tg_msg_id
-                pending_approvals[f"gentg:{tg_msg_id}"] = approval_id
                 pending_approvals[f"gentgorig:{tg_msg_id}"] = approval_id
     else:
         tg_msg_id = send_general_telegram(message, keyboard)
         if tg_msg_id:
             pending_approvals[approval_id]["telegram_message_id"] = tg_msg_id
-            pending_approvals[f"gentg:{tg_msg_id}"] = approval_id
             pending_approvals[f"gentgorig:{tg_msg_id}"] = approval_id
             save_pending_approvals()
 
