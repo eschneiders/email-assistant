@@ -497,12 +497,15 @@ def extract_meeting_details_from_reply(reply_text, original_meeting_details=None
     Returns a meeting_details dict compatible with create_calendar_event.
     """
     fallback = original_meeting_details or {}
+    now_str = datetime.now().strftime("%A %B %d, %Y")
 
     prompt = f"""Extract the confirmed meeting details from this outgoing email reply.
 Respond with a JSON object only, no other text.
 
+TODAY is {now_str}. Use this to resolve relative dates like "monday", "next week", "tomorrow" into ISO dates.
+
 Fields to extract:
-- confirmed_date: (ISO date string e.g. "2026-02-25", or null if not clearly stated)
+- confirmed_date: (ISO date string e.g. "2026-02-25" — resolve relative dates using today's date above, or null if truly unclear)
 - confirmed_time: (string e.g. "14:00", or null if not clearly stated)
 - location: (string, city or address, or "video call", or null)
 - meeting_type: (string: "in-person", "video call", or "phone call")
