@@ -433,6 +433,11 @@ def _handle_telegram_update(update, token):
                     pending_approvals[approval_id]["calendar_json_preview"] = preview
                     pending_approvals[f"tgcal:{sent_id}"] = approval_id
                     save_pending_approvals()
+
+        elif callback_data.startswith("gen_"):
+            # Delegate gen_send:, gen_edit:, gen_discard:, gen_cal: to general handler
+            _handle_general_telegram_update(update, token)
+
         return
 
     # ── Incoming text message ─────────────────────────────────────────────
