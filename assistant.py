@@ -1066,24 +1066,8 @@ def edit_telegram_message(message_id, message, keyboard=None):
 
 
 def edit_general_telegram_message(message_id, message, keyboard=None):
-    """Edit an existing Telegram message (general bot). Returns True on success.
-    Pass keyboard=[] to remove all buttons."""
-    token, chat_id = _get_general_bot_config()
-    if not token or not chat_id:
-        return False
-    payload = {
-        "chat_id": chat_id,
-        "message_id": message_id,
-        "text": message,
-        "parse_mode": "Markdown",
-    }
-    if keyboard is not None:
-        payload["reply_markup"] = {"inline_keyboard": keyboard}
-    resp = requests.post(
-        f"https://api.telegram.org/bot{token}/editMessageText",
-        json=payload, timeout=10,
-    )
-    return resp.ok
+    """Alias for edit_telegram_message — single bot now handles all emails."""
+    return edit_telegram_message(message_id, message, keyboard)
 
 
 def send_telegram(message, keyboard=None):
@@ -1258,46 +1242,9 @@ def process_email(email):
             save_pending_approvals()
 
 
-def _get_general_bot_config():
-    """Read the general-email Telegram bot token from .env."""
-    env = open(os.path.join(_DIR, ".env")).read()
-    token = None
-    chat_id = None
-    for line in env.splitlines():
-        if line.startswith("TELEGRAM_GENERAL_BOT_TOKEN="):
-            token = line.split("=", 1)[1].strip()
-        if line.startswith("TELEGRAM_CHAT_ID="):
-            chat_id = line.split("=", 1)[1].strip()
-    return token, chat_id
-
-
 def send_general_telegram(message, keyboard=None):
-    """Send a message via the general-email bot. Returns message_id or None."""
-    token, chat_id = _get_general_bot_config()
-    if not token or not chat_id:
-        print("  → General Telegram bot not configured, skipping.")
-        return None
-
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "Markdown",
-    }
-    if keyboard:
-        payload["reply_markup"] = {"inline_keyboard": keyboard}
-
-    resp = requests.post(
-        f"https://api.telegram.org/bot{token}/sendMessage",
-        json=payload,
-        timeout=10,
-    )
-    if resp.ok:
-        msg_id = resp.json()["result"]["message_id"]
-        print(f"  → General bot Telegram sent (msg_id={msg_id}).")
-        return msg_id
-    else:
-        print(f"  → General bot Telegram error: {resp.text}")
-        return None
+    """Alias for send_telegram — single bot now handles all emails."""
+    return send_telegram(message, keyboard)
 
 
 def get_email_thread(thread_id):

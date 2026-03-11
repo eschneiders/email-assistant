@@ -10,11 +10,11 @@ from flask import Flask, render_template_string, request, jsonify
 
 from assistant import (
     pending_approvals, send_reply, create_calendar_event, poll_gmail,
-    send_general_telegram, _get_general_bot_config,
-    get_email_thread, draft_general_reply,
+    send_general_telegram, get_email_thread, draft_general_reply,
     extract_meeting_details_from_reply,
     save_pending_approvals, build_calendar_json_preview, resolve_proposed_date,
     edit_telegram_message, edit_general_telegram_message,
+    _get_telegram_config,
 )
 
 app = Flask(__name__)
@@ -330,11 +330,10 @@ def _send_telegram_plain(token, text, chat_id=None, keyboard=None):
 
 
 def _send_general_telegram_plain(token, text, chat_id=None, keyboard=None):
-    """Send a plain-text message via the general bot (no Markdown parsing). Returns message_id or None."""
+    """Send a plain-text message (no Markdown parsing). Returns message_id or None."""
     import requests as _requests
-    from assistant import _get_general_bot_config
     if chat_id is None:
-        _, chat_id = _get_general_bot_config()
+        _, chat_id = _get_telegram_config()
     if not chat_id:
         return None
     payload = {"chat_id": chat_id, "text": text}
@@ -554,6 +553,9 @@ def _handle_telegram_update(update, token):
             except Exception as e:
                 send_telegram(f"❌ Calendar error: {str(e)}")
 
+    # ── Also handle gen_* callbacks and gentg/gentgorig/gentgdraft messages ─
+    _handle_general_telegram_update(update, token)
+
 
 @app.route("/status")
 def status():
@@ -765,50 +767,9 @@ def _handle_general_telegram_update(update, token):
                 send_general_telegram(f"❌ Calendar error: {str(e)}")
 
 
-def poll_general_telegram():
-    """
-    Long-poll the general-email Telegram bot for updates.
-    Runs in a background thread — no webhook needed.
-    """
-    import requests as _requests
-
-    token, _ = _get_general_bot_config()
-    if not token:
-        print("General Telegram bot not configured, skipping polling.")
-        return
-
-    offset = None
-    print("General Telegram bot polling started.")
-
-    while True:
-        try:
-            params = {"timeout": 30, "allowed_updates": ["message", "callback_query"]}
-            if offset:
-                params["offset"] = offset
-
-            resp = _requests.get(
-                f"https://api.telegram.org/bot{token}/getUpdates",
-                params=params,
-                timeout=35,
-            )
-            if not resp.ok:
-                time.sleep(5)
-                continue
-
-            updates = resp.json().get("result", [])
-            for update in updates:
-                offset = update["update_id"] + 1
-                _handle_general_telegram_update(update, token)
-
-        except Exception as e:
-            print(f"General Telegram polling error: {e}")
-            time.sleep(5)
-
-
 def start_polling():
     threading.Thread(target=poll_gmail, daemon=True).start()
     threading.Thread(target=poll_telegram, daemon=True).start()
-    threading.Thread(target=poll_general_telegram, daemon=True).start()
 
 
 if __name__ == "__main__":
