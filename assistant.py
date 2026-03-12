@@ -1253,10 +1253,6 @@ def process_email(email):
     """Notify about incoming email — no auto-draft. User replies with instructions to draft."""
     print(f"\nProcessing email: {email['subject']} from {email['sender']}")
 
-    if email.get("cc_only"):
-        print("  → Edouard is CC'd only, skipping.")
-        return
-
     if is_automated_sender(email):
         print(f"  → Automated sender detected, skipping: {email['sender']}")
         return
