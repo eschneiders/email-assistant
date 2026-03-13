@@ -199,8 +199,8 @@ def _llm_filter_and_clean(email):
 
 Decide if this email needs Edouard's personal response.
 
-Reply NO for: newsletters, automated notifications, calendar invites, order confirmations, receipts, cold sales/marketing outreach, LinkedIn/social notifications, group announcements, or anything that does not expect a direct personal reply from Edouard.
-Reply YES for: emails from real people asking a question, requesting a meeting, following up on a conversation, or clearly expecting a personal response.
+Reply NO for: newsletters, automated notifications, calendar invites, order confirmations, receipts, cold sales/marketing outreach, LinkedIn/social notifications, group announcements, automated welcome/onboarding emails triggered by a signup, or anything that does not expect a direct personal reply from Edouard.
+Reply YES for: emails from real people asking a question, requesting a meeting, following up on a conversation, personally inviting Edouard or CaraOmics to a program, event, or partnership, or clearly expecting a personal response.
 
 If YES, also extract only the main human-written message — remove email footers, legal disclaimers, confidentiality notices, unsubscribe text, lines that are only hyperlinks, excessive blank lines, and signature boilerplate.
 
